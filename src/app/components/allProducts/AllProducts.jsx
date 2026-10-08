@@ -3,17 +3,17 @@ import ProductCard from "../ProductsCard";
 
 const AllProducts = async () => {
   const res = await fetch(
-    "https://api.api-store.workers.dev/api/bazardor/products"
+    "https://api.abcz.workers.dev/api/bazardor/products",
   );
   const data = await res.json();
   const allProducts = data || [];
 
   const priceIncreased = allProducts.filter(
-    (product) => product.change?.dir === "up"
+    (product) => product.change?.dir === "up",
   );
 
   const priceDecreased = allProducts.filter(
-    (product) => product.change?.dir === "down"
+    (product) => product.change?.dir === "down",
   );
 
   return (
@@ -24,28 +24,26 @@ const AllProducts = async () => {
             <span className="text-red-500">▲</span> আজ দাম বেড়েছে
           </h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {priceIncreased.slice(0,6).map((singleCard) => (
+            {priceIncreased.slice(0, 6).map((singleCard) => (
               <ProductCard key={singleCard.id} allProducts={singleCard} />
             ))}
           </div>
         </div>
       )}
 
-      {/* 2. আজ দাম কমেছে */}
       {priceDecreased.length > 0 && (
         <div>
           <h1 className="font-semibold text-lg mb-4 flex items-center gap-2">
             <span className="text-green-600">▼</span> আজ দাম কমেছে
           </h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {priceDecreased.slice(0,6).map((singleCard) => (
+            {priceDecreased.slice(0, 6).map((singleCard) => (
               <ProductCard key={singleCard.id} allProducts={singleCard} />
             ))}
           </div>
         </div>
       )}
 
-      {/* 3. সব পণ্য */}
       <div>
         <div className="mb-4">
           <h1 className="font-semibold text-lg">সব পণ্য</h1>
