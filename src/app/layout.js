@@ -1,5 +1,6 @@
 import {  Noto_Serif_Bengali } from "next/font/google";
 import "./globals.css";
+import Navber from "./components/Navber";
 
 const notoSerifBangali = Noto_Serif_Bengali({
   subsets: ["latin","bengali"],
@@ -19,9 +20,9 @@ export default function RootLayout({ children }) {
       data-theme="light"
       className={`${notoSerifBangali} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-
-
+      <body className="min-h-full flex flex-col bg-[#F0F5F0]">
+        <Navber></Navber>
+        
         <main>
 
         {children}
