@@ -5,10 +5,13 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '**',
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "api.abcz.workers.dev", 
+      },
     ],
   },
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   reactCompiler: true,
