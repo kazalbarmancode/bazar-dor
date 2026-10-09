@@ -26,7 +26,8 @@ const HeroBanner = () => {
                     <Image 
                         src='/bazar-hero.png' 
                         alt='hero banner pic' 
-                        fill
+                        height={400}
+                        width={400}
                         className='object-contain'
                         priority
                     />

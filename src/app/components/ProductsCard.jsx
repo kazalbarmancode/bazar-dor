@@ -1,7 +1,6 @@
 import React from "react";
 
 const ProductCard = ({ allProducts }) => {
-  console.log(allProducts);
   const { categoryNameBn,categoryIcon, unit, today, change } = allProducts || {};
 
   const isUp = change?.dir === "up";
