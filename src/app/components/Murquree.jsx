@@ -2,7 +2,7 @@ import Marquee from "react-fast-marquee";
 
 
 const MarqueeText = async () => {
-  const res = await fetch("https://api.abcz.workers.dev/api/bazardor/products");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/products`);
   const data = await res.json();
   const headLines = data
 

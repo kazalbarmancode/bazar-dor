@@ -12,7 +12,7 @@ const NavCategory = () => {
     const fetchCategories = async () => {
       try {
         const res = await fetch(
-          "https://api.abcz.workers.dev/api/bazardor/categories",
+          `${process.env.NEXT_PUBLIC_BASE_URL}/categories`,
         );
         const data = await res.json();
         setCategories(data);

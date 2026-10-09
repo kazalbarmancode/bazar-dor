@@ -1,19 +1,20 @@
 export const instant = false;
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
- const  CategoryPage=async({ params })=> {
+const CategoryPage = async ({ params }) => {
   const { selectId } = await params;
 
   const catRes = await fetch(
-    "https://api.abcz.workers.dev/api/bazardor/categories",
-    { next: { revalidate: 60 } }
+    `${process.env.NEXT_PUBLIC_BASE_URL}/categories`,
+    { next: { revalidate: 60 } },
   );
   const categories = await catRes.json();
 
   const prodRes = await fetch(
-    `https://api.abcz.workers.dev/api/bazardor/products?category=${selectId}`,
-    { next: { revalidate: 60 } }
+    `${process.env.NEXT_PUBLIC_BASE_URL}/products?category=${selectId}`,
+    { next: { revalidate: 60 } },
   );
   const products = await prodRes.json();
 
@@ -55,8 +56,10 @@ import React from "react";
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {products && products.length > 0 ? (
           products.map((product) => {
-            const isUp = product.change?.dir === "up" || product.change?.dir === "▲";
-            const isDown = product.change?.dir === "down" || product.change?.dir === "▼";
+            const isUp =
+              product.change?.dir === "up" || product.change?.dir === "▲";
+            const isDown =
+              product.change?.dir === "down" || product.change?.dir === "▼";
 
             return (
               <div
@@ -81,35 +84,34 @@ import React from "react";
                     <h3 className="font-bold text-sm text-gray-900">
                       {product.nameBn || product.title}
                     </h3>
-                    <p className="text-xs text-gray-400">
-                      প্রতি কেজি
-                    </p>
+                    <p className="text-xs text-gray-400">প্রতি কেজি</p>
                   </div>
                 </div>
-
-                <div className="flex items-center justify-between border-t border-gray-50 pt-3">
-                  <div>
-                    <p className="text-[11px] text-gray-400">আজকের দাম</p>
-                    <p className="font-bold text-base text-gray-900">
-                      {product.price} টাকা
-                    </p>
-                  </div>
-
-                  {product.change && (
-                    <div
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        isUp
-                          ? "bg-red-50 text-red-600"
-                          : isDown
-                          ? "bg-green-50 text-green-600"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      <span>{isUp ? "▲" : isDown ? "▼" : "—"}</span>
-                      <span>{product.change.pct || 0}%</span>
+               <Link href={`/detailsPage/${product._id || product.id}`}>
+                  <div className="flex items-center justify-between border-t border-gray-50 pt-3">
+                    <div>
+                      <p className="text-[11px] text-gray-400">আজকের দাম</p>
+                      <p className="font-bold text-base text-gray-900">
+                        {product.price} টাকা
+                      </p>
                     </div>
-                  )}
-                </div>
+
+                    {product.change && (
+                      <div
+                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          isUp
+                            ? "bg-red-50 text-red-600"
+                            : isDown
+                              ? "bg-green-50 text-green-600"
+                              : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        <span>{isUp ? "▲" : isDown ? "▼" : "—"}</span>
+                        <span>{product.change.pct || 0}%</span>
+                      </div>
+                    )}
+                  </div>
+                  </Link>
               </div>
             );
           })
@@ -121,5 +123,5 @@ import React from "react";
       </div>
     </main>
   );
-}
+};
 export default CategoryPage;
