@@ -10,13 +10,10 @@ export default function ProfilePage() {
   const user = session?.user;
   const router = useRouter();
 
-  const [name, setName] = useState("");
+const [name, setName] = useState(user?.name || "");
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    if (user?.name) {
-      setName(user.name);
-    }
     if (!isPending && !user) {
       router.push("/signIn");
     }
@@ -24,7 +21,7 @@ export default function ProfilePage() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.refresh();
+    router.push("/signIn");
   };
 
   const handleUpdate = async (e) => {
@@ -70,7 +67,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-200">
               <Image
-                src={"https://img.daisyui.com/images/profile/demo/spiderperson@192.webp" }
+                src={user.image }
                 width={30}
                 height={30}
                 alt={user?.name || "User"}

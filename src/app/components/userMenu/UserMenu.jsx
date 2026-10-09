@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signOut } from "../../../lib/auth-client"; 
+import { useSession, signOut, authClient } from "../../../lib/auth-client"; 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
@@ -15,9 +15,13 @@ const UserMenu = () => {
   const dropdownRef = useRef(null);
 
   const handleSignOut = async () => {
-    setIsOpen(false);
-    await signOut();
-    router.refresh();
+    await authClient.signOut({
+  fetchOptions: {
+    onSuccess: () => {
+      router.push("/signIn"); 
+    },
+  },
+});
   };
 
   useEffect(() => {
