@@ -29,7 +29,7 @@ const SignUpPage = () => {
 
       if (data) {
         toast.success("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে! সাইন ইন করুন।");
-        router.push("/signIn");
+        router.push("/");
       }
 
       if (error) {
