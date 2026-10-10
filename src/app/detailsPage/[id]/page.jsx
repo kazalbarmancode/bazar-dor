@@ -30,13 +30,13 @@ const getProductDetails = async (id) => {
         );
         if (found) return found;
       }
-      throw new Error(`Failed to fetch product details (Status: ${res.status})`);
+      return null; // এরর থ্রো না করে নাল রিটার্ন করা হলো যাতে পেজ ক্র্যাশ না করে
     }
 
     return await res.json();
   } catch (error) {
     console.error("Error in getProductDetails:", error.message);
-    throw error;
+    return null;
   }
 };
 
@@ -46,8 +46,15 @@ const ProductDetailsPage = async ({ params }) => {
 
   if (!product) {
     return (
-      <div className="max-w-6xl mx-auto p-10 text-center text-gray-500">
-        পণ্য পাওয়া যায়নি!
+      <div className="max-w-6xl mx-auto px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">পণ্যটি পাওয়া যায়নি</h1>
+        <p className="text-gray-500 mb-6">আপনি যে পণ্যটি খুঁজছেন তা মুছে ফেলা হয়েছে অথবা বিদ্যমান নেই।</p>
+        <Link
+          href="/"
+          className="inline-flex items-center px-6 py-3 rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm"
+        >
+          হোম পেজে ফিরে যান
+        </Link>
       </div>
     );
   }
@@ -95,7 +102,6 @@ const ProductDetailsPage = async ({ params }) => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 font-sans text-gray-800">
-      
       <div className="text-xs text-gray-500 mb-6 flex items-center gap-1">
         <Link href="/" className="hover:underline text-gray-600">
           হোম
@@ -106,11 +112,11 @@ const ProductDetailsPage = async ({ params }) => {
         <span className="text-gray-900 font-medium">{nameBn}</span>
       </div>
 
-      <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-8 flex items-center justify-between shadow-sm">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-8 flex items-center justify-between shadow-sm flex-wrap gap-4">
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center text-3xl shrink-0">
+          <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center text-3xl shrink-0 overflow-hidden">
             {image && image.startsWith("http") ? (
-              <Image src={image} alt={nameBn} className="w-10 h-10 object-contain" />
+              <Image src={image} alt={nameBn || "product"} width={40} height={40} className="object-contain" />
             ) : (
               <span>{image || "🍚"}</span>
             )}
@@ -118,10 +124,10 @@ const ProductDetailsPage = async ({ params }) => {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{nameBn}</h1>
             <p className="text-xs text-gray-500 mt-1">
-              প্রতি {getUnitBn(unit)} • {categoryNameBn || "ক্যাটাগরি"}
+              প্রতি {getUnitBn(unit)}
             </p>
             <p className="text-xs text-gray-500 mt-1 font-normal">
-              গতকালকের তুলনায় আজ দাম {isUp ? "বেড়েছে" : "কমেছে"}: <span className="font-semibold">{diffPrice} টাকা</span>
+              গতকালকের তুলনায় আজ দাম {isUp ? "বেড়েছে" : "কমেছে"}: <span className="font-semibold">{diffPrice} টাকা</span>
             </p>
           </div>
         </div>
@@ -129,12 +135,12 @@ const ProductDetailsPage = async ({ params }) => {
         <div className="bg-gray-50/80 border border-gray-100 px-6 py-3 rounded-xl text-right">
           <p className="text-[11px] text-gray-400 mb-0.5">আজকের দাম</p>
           <p className="text-2xl font-bold text-gray-900">
-            {today} <span className="text-sm font-normal text-gray-600">টাকা/কেজি</span>
+            {today} <span className="text-sm font-normal text-gray-600">টাকা/{getUnitBn(unit)}</span>
           </p>
           {change && (
             <p className={`text-xs font-semibold mt-0.5 flex items-center justify-end gap-0.5 ${isUp ? "text-red-500" : "text-emerald-600"}`}>
               <span>{isUp ? "▲" : "▼"}</span>
-              <span>{Math.abs(change.pct)}%</span>
+              <span>{Math.abs(change.pct || 0)}%</span>
             </p>
           )}
         </div>
@@ -145,13 +151,12 @@ const ProductDetailsPage = async ({ params }) => {
           দামের সারসংক্ষেপ
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          
           <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
             <p className="text-xs text-gray-400 mb-1">সর্বনিম্ন দর</p>
             <p className="text-xl font-bold text-emerald-600 mb-1">
               {minPrice} টাকা
             </p>
-            <p className="text-xs text-gray-400">সবচেয়ে কম {minMarketName || "বাজারে"}</p>
+            <p className="text-xs text-gray-400">সবচেয়ে কম {minMarketName || "বাজারে"}</p>
           </div>
 
           <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
@@ -159,38 +164,37 @@ const ProductDetailsPage = async ({ params }) => {
             <p className="text-xl font-bold text-red-500 mb-1">
               {maxPrice} টাকা
             </p>
-            <p className="text-xs text-gray-400">সবচেয়ে বেশি {maxMarketName || "বাজারে"}</p>
+            <p className="text-xs text-gray-400">সবচেয়ে বেশি {maxMarketName || "বাজারে"}</p>
           </div>
 
           <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <p className="text-xs text-gray-400 mb-1">গড় দাম</p>
+            <p className="text-xs text-gray-400 mb-1">গড় দাম</p>
             <p className="text-xl font-bold text-emerald-600 mb-1">
               {avgPrice} টাকা
             </p>
             <p className="text-xs text-gray-400">প্রতি {getUnitBn(unit)} এর হিসাব</p>
           </div>
-
         </div>
       </div>
 
       <div className="flex flex-col">
         <div>
-          <h2 className="text-base font-bold text-gray-900 mb-4 ">
-          বাজারভিত্তিক আজকের দাম
-        </h2>
+          <h2 className="text-base font-bold text-gray-900 mb-4">
+            বাজারভিত্তিক আজকের দাম
+          </h2>
         </div>
-        <div className="overflow-x-auto border-gray-100 bg-white shodow-sm p-6 rounded-2xl ">
+        <div className="overflow-x-auto border border-gray-100 bg-white shadow-sm p-6 rounded-2xl">
           <table className="w-full text-left border-collapse">
             <thead> 
-              <tr className=" border-gray-100 text-xs text-black font-semibold">
+              <tr className="border-b border-gray-100 text-xs text-black font-semibold">
                 <th className="pb-3 font-medium">বাজার</th>
                 <th className="pb-3 font-medium">বিভাগ</th>
                 <th className="pb-3 font-medium">সর্বনিম্ন</th>
                 <th className="pb-3 font-medium">সর্বাধিক</th>
-                <th className="pb-3 font-medium text-right pr-2">গড়</th>
+                <th className="pb-3 font-medium text-right pr-2">গড়</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50  text-xs text-gray-700">
+            <tbody className="divide-y divide-gray-50 text-xs text-gray-700">
               {markets.map((item, index) => {
                 const itemAvg = ((item.min + item.max) / 2).toFixed(1);
                 return (
@@ -209,7 +213,6 @@ const ProductDetailsPage = async ({ params }) => {
           </table>
         </div>
       </div>
-
     </div>
   );
 };

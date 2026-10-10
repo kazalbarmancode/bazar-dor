@@ -21,10 +21,34 @@ const CategoryPage = async ({ params, searchParams }) => {
   const products = await prodRes.json();
 
   const activeCategory =
-    categories.find((cat) => (cat.slug || cat.id) === selectId) ||
-    categories[0];
+    categories.find((cat) => (cat.slug || cat.id) === selectId);
 
-  let sortedProducts = [...(products || [])];
+  if (!activeCategory || !products || products.length === 0) {
+    return (
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+        <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+          <div className="w-24 h-24 mb-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-4xl shadow-sm">
+            🔍
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            কোনো তথ্য পাওয়া যায়নি
+          </h1>
+          <p className="text-gray-600 max-w-md mb-8 text-base">
+            আপনি যে ক্যাটাগরিটি খুঁজছেন সেটি বিদ্যমান নেই অথবা বর্তমানে এই ক্যাটাগরিতে কোনো পণ্য যুক্ত করা হয়নি।
+          </p>
+
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+          >
+            হোম পেজে ফিরে যান
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  let sortedProducts = [...products];
   if (sortBy === "low-to-high") {
     sortedProducts.sort((a, b) => Number(a.today) - Number(b.today));
   } else if (sortBy === "high-to-low") {
@@ -54,7 +78,7 @@ const CategoryPage = async ({ params, searchParams }) => {
               {activeCategory?.nameBn || selectId}
             </h2>
             <p className="text-xs text-gray-500 mt-1">
-              {sortedProducts?.length || 0} টি পণ্যের আজকের দাম ও পরিবর্তন
+              {sortedProducts.length} টি পণ্যের আজকের দাম ও পরিবর্তন
             </p>
           </div>
         </div>
@@ -64,76 +88,70 @@ const CategoryPage = async ({ params, searchParams }) => {
         </div>
       </div>
       <p className="text-xs mx-1 text-gray-500">
-        মোট {sortedProducts?.length || 0} টি পণ্য দেখানো হচ্ছে
+        মোট {sortedProducts.length} টি পণ্য দেখানো হচ্ছে
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {sortedProducts && sortedProducts.length > 0 ? (
-          sortedProducts.map((product) => {
-            const isUp =
-              product.change?.dir === "up" || product.change?.dir === "▲";
-            const isDown =
-              product.change?.dir === "down" || product.change?.dir === "▼";
+        {sortedProducts.map((product) => {
+          const isUp =
+            product.change?.dir === "up" || product.change?.dir === "▲";
+          const isDown =
+            product.change?.dir === "down" || product.change?.dir === "▼";
 
-            return (
-              <div
-                key={product.id}
-                className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between gap-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-lg shrink-0 overflow-hidden">
-                    {product.image && product.image.startsWith("http") ? (
-                      <Image
-                        src={product.image}
-                        alt={product.nameBn || "product"}
-                        width={28}
-                        height={28}
-                        className="object-contain"
-                      />
-                    ) : (
-                      <span>{product.image || "🍚"}</span>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-sm text-gray-900">
-                      {product.nameBn || product.title}
-                    </h3>
-                    <p className="text-xs text-gray-400">প্রতি কেজি</p>
-                  </div>
+          return (
+            <div
+              key={product._id || product.id}
+              className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between gap-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-lg shrink-0 overflow-hidden">
+                  {product.image && product.image.startsWith("http") ? (
+                    <Image
+                      src={product.image}
+                      alt={product.nameBn || "product"}
+                      width={28}
+                      height={28}
+                      className="object-contain"
+                    />
+                  ) : (
+                    <span>{product.image || "🍚"}</span>
+                  )}
                 </div>
-                <Link href={`/detailsPage/${product._id || product.id}`}>
-                  <div className="flex items-center justify-between border-t border-gray-50 pt-3">
-                    <div>
-                      <p className="text-[11px] text-gray-400">আজকের দাম</p>
-                      <p className="font-bold text-base text-gray-900">
-                        {product.today} টাকা
-                      </p>
-                    </div>
-
-                    {product.change && (
-                      <div
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                          isUp
-                            ? "bg-red-50 text-red-600"
-                            : isDown
-                              ? "bg-green-50 text-green-600"
-                              : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        <span>{isUp ? "▲" : isDown ? "▼" : "—"}</span>
-                        <span>{product.change.pct || 0}%</span>
-                      </div>
-                    )}
-                  </div>
-                </Link>
+                <div>
+                  <h3 className="font-bold text-sm text-gray-900">
+                    {product.nameBn || product.title}
+                  </h3>
+                  <p className="text-xs text-gray-400">প্রতি কেজি</p>
+                </div>
               </div>
-            );
-          })
-        ) : (
-          <p className="text-sm text-gray-500 col-span-full py-10 text-center">
-            এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি।
-          </p>
-        )}
+              <Link href={`/detailsPage/${product._id || product.id}`}>
+                <div className="flex items-center justify-between border-t border-gray-50 pt-3">
+                  <div>
+                    <p className="text-[11px] text-gray-400">আজকের দাম</p>
+                    <p className="font-bold text-base text-gray-900">
+                      {product.today} টাকা
+                    </p>
+                  </div>
+
+                  {product.change && (
+                    <div
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                        isUp
+                          ? "bg-red-50 text-red-600"
+                          : isDown
+                          ? "bg-green-50 text-green-600"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      <span>{isUp ? "▲" : isDown ? "▼" : "—"}</span>
+                      <span>{product.change.pct || 0}%</span>
+                    </div>
+                  )}
+                </div>
+              </Link>
+            </div>
+          );
+        })}
       </div>
     </main>
   );
