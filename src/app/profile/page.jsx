@@ -4,13 +4,14 @@ import Image from "next/image";
 import { useSession, signOut, updateUser } from "../../lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function ProfilePage() {
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const router = useRouter();
 
-const [name, setName] = useState(user?.name || "");
+  const [name, setName] = useState(user?.name || "");
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
@@ -26,18 +27,22 @@ const [name, setName] = useState(user?.name || "");
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      toast.warn("অনুগ্রহ করে একটি নাম লিখুন!");
+      return;
+    }
 
     try {
       setIsUpdating(true);
       await updateUser({
         name: name,
       });
-      alert("নাম সফলভাবে আপডেট করা হয়েছে!");
+      
+      toast.success("নাম সফলভাবে আপডেট করা হয়েছে!");
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert("নাম আপডেট করতে সমস্যা হয়েছে।");
+      toast.error("নাম আপডেট করতে সমস্যা হয়েছে।");
     } finally {
       setIsUpdating(false);
     }
@@ -66,15 +71,13 @@ const [name, setName] = useState(user?.name || "");
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-200">
-              <Image
-                src={user.image }
-                width={30}
-                height={30}
-                alt={user?.name || "User"}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover rounded-full"
-
-              />
+              {user?.image ? (
+                <Image src={user.image} alt="Profile" width={100} height={100} />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span>{user?.name?.[0] || "U"}</span>
+                </div>
+              )}
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900">{user.name}</h2>
@@ -102,6 +105,7 @@ const [name, setName] = useState(user?.name || "");
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#05893E] focus:bg-white transition-colors"
                 placeholder="আপনার নাম লিখুন"
+                autoComplete="off"
               />
             </div>
 

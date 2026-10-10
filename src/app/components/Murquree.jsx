@@ -21,7 +21,7 @@ const MarqueeText = async () => {
                 <span className="font-semibold text-black">{dt.nameBn}:</span>
 
                 <span className="ml-1 sm:ml-1.5 font-bold text-yellow-300">
-                  ৳{dt.today}/{dt.unit}
+                  ৳ {dt.today}/{dt.unit}
                 </span>
 
                 {dt.change && (

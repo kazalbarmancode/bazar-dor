@@ -1,15 +1,17 @@
 export const instant = false;
+import SortDropDown from "../../sortDropDown/SortDropDown";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const CategoryPage = async ({ params }) => {
+const CategoryPage = async ({ params, searchParams }) => {
   const { selectId } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const sortBy = resolvedSearchParams.sort || "default";
 
-  const catRes = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/categories`,
-    { next: { revalidate: 60 } },
-  );
+  const catRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/categories`, {
+    next: { revalidate: 60 },
+  });
   const categories = await catRes.json();
 
   const prodRes = await fetch(
@@ -22,40 +24,52 @@ const CategoryPage = async ({ params }) => {
     categories.find((cat) => (cat.slug || cat.id) === selectId) ||
     categories[0];
 
+  let sortedProducts = [...(products || [])];
+  if (sortBy === "low-to-high") {
+    sortedProducts.sort((a, b) => Number(a.today) - Number(b.today));
+  } else if (sortBy === "high-to-low") {
+    sortedProducts.sort((a, b) => Number(b.today) - Number(a.today));
+  }
+
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-          {activeCategory?.iconUrl ? (
-            <Image
-              src={activeCategory.iconUrl}
-              alt={activeCategory.nameBn || "Category"}
-              width={32}
-              height={32}
-              className="w-8 h-8 object-contain"
-            />
-          ) : (
-            <span className="text-2xl">{activeCategory?.icon || "🍚"}</span>
-          )}
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
+            {activeCategory?.iconUrl ? (
+              <Image
+                src={activeCategory.iconUrl}
+                alt={activeCategory.nameBn || "Category"}
+                width={32}
+                height={32}
+                className="w-8 h-8 object-contain"
+              />
+            ) : (
+              <span className="text-2xl">{activeCategory?.icon || "🍚"}</span>
+            )}
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">
+              {activeCategory?.nameBn || selectId}
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              {sortedProducts?.length || 0} টি পণ্যের আজকের দাম ও পরিবর্তন
+            </p>
+          </div>
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            {activeCategory?.nameBn || selectId}
-          </h2>
-          <p className="text-xs text-gray-500 mt-1">
-            {products?.length || 0} টি পণ্যের আজকের দাম ও পরিবর্তন
-          </p>
+          <SortDropDown currentSort={sortBy} />
         </div>
       </div>
-
       <p className="text-xs mx-1 text-gray-500">
-        মোট {products?.length || 0} টি পণ্য দেখানো হচ্ছে
+        মোট {sortedProducts?.length || 0} টি পণ্য দেখানো হচ্ছে
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {products && products.length > 0 ? (
-          products.map((product) => {
+        {sortedProducts && sortedProducts.length > 0 ? (
+          sortedProducts.map((product) => {
             const isUp =
               product.change?.dir === "up" || product.change?.dir === "▲";
             const isDown =
@@ -87,12 +101,12 @@ const CategoryPage = async ({ params }) => {
                     <p className="text-xs text-gray-400">প্রতি কেজি</p>
                   </div>
                 </div>
-               <Link href={`/detailsPage/${product._id || product.id}`}>
+                <Link href={`/detailsPage/${product._id || product.id}`}>
                   <div className="flex items-center justify-between border-t border-gray-50 pt-3">
                     <div>
                       <p className="text-[11px] text-gray-400">আজকের দাম</p>
                       <p className="font-bold text-base text-gray-900">
-                        {product.price} টাকা
+                        {product.today} টাকা
                       </p>
                     </div>
 
@@ -111,7 +125,7 @@ const CategoryPage = async ({ params }) => {
                       </div>
                     )}
                   </div>
-                  </Link>
+                </Link>
               </div>
             );
           })

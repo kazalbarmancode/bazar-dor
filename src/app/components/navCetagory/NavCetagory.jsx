@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 
 const NavCategory = () => {
   const pathname = usePathname();
-  const currentCategory = pathname.split("/").pop() || "chal";
+  const currentCategory = pathname.split("/").pop() || "null";
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const fetchCategories = async () => {

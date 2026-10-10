@@ -2,6 +2,7 @@ import {  Noto_Serif_Bengali } from "next/font/google";
 import "./globals.css";
 import Navber from "./components/Navber";
 import Footer from "./components/Footer";
+import { ToastContainer } from "react-toastify";
 
 const notoSerifBangali = Noto_Serif_Bengali({
   subsets: ["latin","bengali"],
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
       className={`${notoSerifBangali} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#F0F5F0]">
+        <ToastContainer />
         <Navber></Navber>
         
         <main>
