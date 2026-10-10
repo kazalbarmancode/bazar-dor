@@ -14,7 +14,7 @@ const Navber = () => {
         <div className="flex justify-between">
          <Link href={"/"}>
           <div className="flex items-center gap-3">
-            <div className="bg-[#05893E] rounded-2xl p-2.5 sm:p-3 shrink-0">
+            <div className="bg-[#6af9a8] rounded-2xl p-2.5 sm:p-3 shrink-0">
               <Image
                 src="/logo-icon.png"
                 alt="Bazar Dor Logo"

@@ -25,7 +25,9 @@ const NavCategory = () => {
   }, []);
 
   return (
-    <div className="flex items-center gap-2 sm:gap-3 my-2 py-1 overflow-x-auto no-scrollbar">
+    <div className="flex items-center gap-2 sm:gap-3 my-2 py-1 overflow-x-auto"
+    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    >
       {categories.map((item) => {
         const categorySlug = item.slug || item.id;
         const isActive = currentCategory === categorySlug;
